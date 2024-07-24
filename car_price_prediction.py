@@ -108,6 +108,7 @@ def reverse_transform(input_features):
 
     # Initialize a dictionary with zeros for all one-hot columns
     original_format = {
+        'selling_price': 0,  # Add selling_price to original_format
         'distance_Low': 0, 'distance_Medium': 0, 'distance_High': 0, 'distance_Very High': 0, 'distance_Extremely High': 0,
         'fuel_CNG': 0, 'fuel_Diesel': 0, 'fuel_LPG': 0, 'fuel_Petrol': 0,
         'seller_Dealer': 0, 'seller_Individual': 0, 'seller_Trustmark Dealer': 0,
@@ -125,6 +126,7 @@ def reverse_transform(input_features):
     original_format[car_brand_mapping[input_features['car_brand'][0]]] = 1
 
     # Add the rest of the columns
+    original_format['selling_price'] = input_features['selling_price'][0]
     original_format['mileage_km'] = input_features['mileage_km'][0]
     original_format['engine'] = input_features['engine'][0]
     original_format['seats'] = input_features['seats'][0]
