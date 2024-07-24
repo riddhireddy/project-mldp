@@ -1,5 +1,4 @@
 # streamlit_app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -7,26 +6,83 @@ from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostRegressor
 import pickle
 
+# Function to transform the dataset
+def transform_dataset(df):
+    distance_mapping = {
+        'distance_Low': 'Low',
+        'distance_Medium': 'Medium',
+        'distance_High': 'High',
+        'distance_Very High': 'Very High',
+        'distance_Extremely High': 'Extremely High'
+    }
+    
+    fuel_mapping = {
+        'fuel_CNG': 'CNG',
+        'fuel_Diesel': 'Diesel',
+        'fuel_LPG': 'LPG',
+        'fuel_Petrol': 'Petrol'
+    }
+
+    seller_mapping = {
+        'seller_Dealer': 'Dealer',
+        'seller_Individual': 'Individual',
+        'seller_Trustmark Dealer': 'Trustmark Dealer'
+    }
+
+    owner_mapping = {
+        'owner_First Owner': 'First Owner',
+        'owner_Fourth & Above Owner': 'Fourth & Above Owner',
+        'owner_Second Owner': 'Second Owner',
+        'owner_Third Owner': 'Third Owner'
+    }
+
+    car_brand_mapping = {
+        'car_brand_Chevrolet': 'Chevrolet',
+        'car_brand_Ford': 'Ford',
+        'car_brand_Honda': 'Honda',
+        'car_brand_Hyundai': 'Hyundai',
+        'car_brand_Mahindra': 'Mahindra',
+        'car_brand_Maruti': 'Maruti',
+        'car_brand_Renault': 'Renault',
+        'car_brand_Tata': 'Tata',
+        'car_brand_Toyota': 'Toyota',
+        'car_brand_Volkswagen': 'Volkswagen'
+    }
+
+    def get_column_name(row, mapping):
+        for col in mapping:
+            if row[col] == 1:
+                return mapping[col]
+        return None
+
+    df['distance'] = df.apply(lambda row: get_column_name(row, distance_mapping), axis=1)
+    df['fuel'] = df.apply(lambda row: get_column_name(row, fuel_mapping), axis=1)
+    df['seller_type'] = df.apply(lambda row: get_column_name(row, seller_mapping), axis=1)
+    df['owner'] = df.apply(lambda row: get_column_name(row, owner_mapping), axis=1)
+    df['car_brand'] = df.apply(lambda row: get_column_name(row, car_brand_mapping), axis=1)
+    df['transmission'] = df['transmission'].map({1: 'Automatic', 0: 'Manual'})
+
+    return df[['car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
+
 # Title
 st.title("Car Price Prediction App")
 st.write("This app predicts the price of a car based on its features.")
 
 # Load data
-df = pd.read_csv('cardekho.csv')
-
-# Extract car brand from the name
-df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
+df = pd.read_csv('processed_cardekho.csv')
+df = transform_dataset(df)
 
 # Display data
 if st.checkbox("Show raw data"):
     st.write(df.head())
 
-# Create selection Arrays
+# Create selection arrays
 car_brandArr = df['car_brand'].unique()
 transmissionArr = df['transmission'].unique()
 fuelArr = df['fuel'].unique()
 seller_typeArr = df['seller_type'].unique()
 ownerArr = df['owner'].unique()
+distanceArr = df['distance'].unique()
 
 # User input for new prediction
 st.sidebar.header("Input Features")
@@ -39,7 +95,7 @@ transmission = st.sidebar.selectbox("Transmission", transmissionArr)
 fuel = st.sidebar.selectbox("Fuel Type", fuelArr)
 seller_type = st.sidebar.selectbox("Seller Type", seller_typeArr)
 owner = st.sidebar.selectbox("Owner Type", ownerArr)
-distance = st.sidebar.selectbox("Distance Category", ['Low', 'Medium', 'High', 'Very High', 'Extremely High'])
+distance = st.sidebar.selectbox("Distance Category", distanceArr)
 
 # Prepare input for prediction
 input_features = pd.DataFrame({
@@ -58,16 +114,11 @@ input_features = pd.DataFrame({
 # One-hot encode categorical features (dummy encoding)
 input_features = pd.get_dummies(input_features)
 df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
-
-# Ensure input features have the same columns as the training data
-missing_cols = set(df_encoded.columns) - set(input_features.columns)
-for c in missing_cols:
-    input_features[c] = 0
-input_features = input_features[df_encoded.columns]
+input_features = input_features.reindex(columns=df_encoded.columns, fill_value=0)
 
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = df_encoded.drop(columns=['selling_price'])
+X = df.drop(columns=['selling_price'])
 scaler.fit(X)
 input_features_scaled = scaler.transform(input_features)
 
