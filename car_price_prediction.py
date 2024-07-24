@@ -184,19 +184,16 @@ input_features = pd.DataFrame({
 # Convert input_features back to the original format
 input_features_original_format = reverse_transform(input_features)
 
+# One-hot encode categorical features (dummy encoding)
+input_features_original_format = pd.get_dummies(input_features_original_format)
+df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
+input_features_original_format = input_features_original_format.reindex(columns=df_encoded.columns, fill_value=0)
+
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = df.drop(columns=['selling_price'])
+X = df_encoded.drop(columns=['selling_price'])
 scaler.fit(X)
-input_features_scaled = scaler.transform(input_features_original_format.drop(columns=['distance_km']))
+input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
-with open('catboost_model.pkl', 'rb') as file:
-    model = pickle.load(file)
-
-# Make prediction
-prediction = model.predict(input_features_scaled)
-
-# Display prediction
-st.subheader("Predicted Selling Price")
-st.write(f"${prediction[0]:,.2f}")
+with open('catboost_model.pkl', 'rb') as
