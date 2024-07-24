@@ -3,7 +3,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostRegressor
 import pickle
@@ -59,7 +58,12 @@ input_features = pd.DataFrame({
 # One-hot encode categorical features (dummy encoding)
 input_features = pd.get_dummies(input_features)
 df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
-input_features = input_features.reindex(columns=df_encoded.columns, fill_value=0)
+
+# Ensure input features have the same columns as the training data
+missing_cols = set(df_encoded.columns) - set(input_features.columns)
+for c in missing_cols:
+    input_features[c] = 0
+input_features = input_features[df_encoded.columns]
 
 # Load scaler and scale input features
 scaler = StandardScaler()
