@@ -125,7 +125,6 @@ def reverse_transform(input_features):
     original_format[car_brand_mapping[input_features['car_brand'][0]]] = 1
 
     # Add the rest of the columns
-    original_format['selling_price'] = df['selling_price']
     original_format['mileage_km'] = input_features['mileage_km'][0]
     original_format['engine'] = input_features['engine'][0]
     original_format['seats'] = input_features['seats'][0]
@@ -187,8 +186,7 @@ input_features_original_format = reverse_transform(input_features)
 
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = input_features_original_format.drop(columns=['selling_price'])
-scaler.fit(X)
+scaler.fit(input_features_original_format)
 input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
