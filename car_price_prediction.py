@@ -6,7 +6,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from catboost import CatBoostRegressor
-from joblib import load
 import pickle
 
 # Title
@@ -14,22 +13,10 @@ st.title("Car Price Prediction App")
 st.write("This app predicts the price of a car based on its features.")
 
 # Load data
-df = pd.read_csv('processed_cardekho.csv')
+df = pd.read_csv('cardekho.csv')
 
-# Identify the columns representing car brands
-car_brand_columns = [col for col in df.columns if 'car_brand' in col or col.endswith('_brand')]
-
-# Create the 'car_brand' column
-def get_car_brand(row):
-    for col in car_brand_columns:
-        if row[col] == 1:
-            return col.replace('car_brand_', '').replace('_brand', '')
-    return None
-
-df['car_brand'] = df.apply(get_car_brand, axis=1)
-
-# Drop the original one-hot encoded columns
-df = df.drop(columns=car_brand_columns)
+# Extract car brand from the name
+df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
 
 # Display data
 if st.checkbox("Show raw data"):
@@ -56,7 +43,7 @@ owner = st.sidebar.selectbox("Owner Type", ownerArr)
 distance = st.sidebar.selectbox("Distance Category", ['Low', 'Medium', 'High', 'Very High', 'Extremely High'])
 
 # Prepare input for prediction
-input_features = pd.DataFrame({                 
+input_features = pd.DataFrame({
     'car_brand': [car_brand],
     'mileage_km': [mileage_km],
     'engine': [engine],
@@ -76,7 +63,7 @@ input_features = input_features.reindex(columns=df_encoded.columns, fill_value=0
 
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = df.drop(columns=['selling_price'])
+X = df_encoded.drop(columns=['selling_price'])
 scaler.fit(X)
 input_features_scaled = scaler.transform(input_features)
 
