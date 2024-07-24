@@ -130,7 +130,7 @@ def reverse_transform(input_features):
     original_format['seats'] = input_features['seats'][0]
     original_format['car_age'] = input_features['car_age'][0]
     original_format['transmission'] = 1 if input_features['transmission'][0] == 'Automatic' else 0
-    original_format['distance_km'] = input_features['distance'][0]
+    original_format['distance_km'] = input_features['distance_km'][0]
 
     return pd.DataFrame([original_format])
 
@@ -166,6 +166,7 @@ fuel = st.sidebar.selectbox("Fuel Type", fuelArr)
 seller_type = st.sidebar.selectbox("Seller Type", seller_typeArr)
 owner = st.sidebar.selectbox("Owner Type", ownerArr)
 distance = st.sidebar.selectbox("Distance Category", distanceArr)
+distance_km = st.sidebar.number_input("Distance (km)", min_value=0, max_value=500000)
 
 # Prepare input for prediction
 input_features = pd.DataFrame({
@@ -178,7 +179,8 @@ input_features = pd.DataFrame({
     'fuel': [fuel],
     'seller_type': [seller_type],
     'owner': [owner],
-    'distance': [distance]
+    'distance': [distance],
+    'distance_km' : [distance_km]
 })
 
 # Convert input_features back to the original format
