@@ -187,7 +187,7 @@ input_features_original_format = reverse_transform(input_features)
 
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = df_encoded.drop(columns=['selling_price'])
+X = input_features_original_format.drop(columns=['selling_price'])
 scaler.fit(X)
 input_features_scaled = scaler.transform(input_features_original_format)
 
