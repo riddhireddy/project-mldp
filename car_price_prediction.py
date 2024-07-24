@@ -65,7 +65,7 @@ scaler.fit(X_encoded)
 input_features_scaled = scaler.transform(input_features_encoded)
 
 # Load model
-with open('catboost_model.pkl', 'rb') as file:
+with open('best_model.pkl', 'rb') as file:
     model = pickle.load(file)
 
 # Make prediction
