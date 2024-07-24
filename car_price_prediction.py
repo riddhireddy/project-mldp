@@ -183,7 +183,7 @@ input_features = pd.DataFrame({
 
 # Convert input_features back to the original format
 input_features_original_format = reverse_transform(input_features)
-
+st.write(input_features_original_format)
 # Load scaler and scale input features
 scaler = StandardScaler()
 scaler.fit(input_features_original_format)
