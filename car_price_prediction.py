@@ -64,6 +64,76 @@ def transform_dataset(df):
 
     return df[['selling_price', 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
 
+def reverse_transform(input_features):
+    distance_mapping = {
+        'Low': 'distance_Low',
+        'Medium': 'distance_Medium',
+        'High': 'distance_High',
+        'Very High': 'distance_Very High',
+        'Extremely High': 'distance_Extremely High'
+    }
+
+    fuel_mapping = {
+        'CNG': 'fuel_CNG',
+        'Diesel': 'fuel_Diesel',
+        'LPG': 'fuel_LPG',
+        'Petrol': 'fuel_Petrol'
+    }
+
+    seller_mapping = {
+        'Dealer': 'seller_Dealer',
+        'Individual': 'seller_Individual',
+        'Trustmark Dealer': 'seller_Trustmark Dealer'
+    }
+
+    owner_mapping = {
+        'First Owner': 'owner_First Owner',
+        'Fourth & Above Owner': 'owner_Fourth & Above Owner',
+        'Second Owner': 'owner_Second Owner',
+        'Third Owner': 'owner_Third Owner'
+    }
+
+    car_brand_mapping = {
+        'Chevrolet': 'car_brand_Chevrolet',
+        'Ford': 'car_brand_Ford',
+        'Honda': 'car_brand_Honda',
+        'Hyundai': 'car_brand_Hyundai',
+        'Mahindra': 'car_brand_Mahindra',
+        'Maruti': 'car_brand_Maruti',
+        'Renault': 'car_brand_Renault',
+        'Tata': 'car_brand_Tata',
+        'Toyota': 'car_brand_Toyota',
+        'Volkswagen': 'car_brand_Volkswagen'
+    }
+
+    # Initialize a dictionary with zeros for all one-hot columns
+    original_format = {
+        'distance_Low': 0, 'distance_Medium': 0, 'distance_High': 0, 'distance_Very High': 0, 'distance_Extremely High': 0,
+        'fuel_CNG': 0, 'fuel_Diesel': 0, 'fuel_LPG': 0, 'fuel_Petrol': 0,
+        'seller_Dealer': 0, 'seller_Individual': 0, 'seller_Trustmark Dealer': 0,
+        'owner_First Owner': 0, 'owner_Fourth & Above Owner': 0, 'owner_Second Owner': 0, 'owner_Third Owner': 0,
+        'car_brand_Chevrolet': 0, 'car_brand_Ford': 0, 'car_brand_Honda': 0, 'car_brand_Hyundai': 0,
+        'car_brand_Mahindra': 0, 'car_brand_Maruti': 0, 'car_brand_Renault': 0, 'car_brand_Tata': 0,
+        'car_brand_Toyota': 0, 'car_brand_Volkswagen': 0
+    }
+
+    # Set the appropriate columns to 1 based on the input features
+    original_format[distance_mapping[input_features['distance'][0]]] = 1
+    original_format[fuel_mapping[input_features['fuel'][0]]] = 1
+    original_format[seller_mapping[input_features['seller_type'][0]]] = 1
+    original_format[owner_mapping[input_features['owner'][0]]] = 1
+    original_format[car_brand_mapping[input_features['car_brand'][0]]] = 1
+
+    # Add the rest of the columns
+    original_format['mileage_km'] = input_features['mileage_km'][0]
+    original_format['engine'] = input_features['engine'][0]
+    original_format['seats'] = input_features['seats'][0]
+    original_format['car_age'] = input_features['car_age'][0]
+    original_format['transmission'] = 1 if input_features['transmission'][0] == 'Automatic' else 0
+    original_format['distance_km'] = np.nan  # Placeholder for distance_km, which is not provided in input_features
+
+    return pd.DataFrame([original_format])
+
 # Title
 st.title("Car Price Prediction App")
 st.write("This app predicts the price of a car based on its features.")
@@ -111,16 +181,14 @@ input_features = pd.DataFrame({
     'distance': [distance]
 })
 
-# One-hot encode categorical features (dummy encoding)
-input_features = pd.get_dummies(input_features)
-df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
-input_features = input_features.reindex(columns=df_encoded.columns, fill_value=0)
+# Convert input_features back to the original format
+input_features_original_format = reverse_transform(input_features)
 
 # Load scaler and scale input features
 scaler = StandardScaler()
 X = df.drop(columns=['selling_price'])
 scaler.fit(X)
-input_features_scaled = scaler.transform(input_features)
+input_features_scaled = scaler.transform(input_features_original_format.drop(columns=['distance_km']))
 
 # Load model
 with open('catboost_model.pkl', 'rb') as file:
