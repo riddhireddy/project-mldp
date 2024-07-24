@@ -62,7 +62,7 @@ def transform_dataset(df):
     df['car_brand'] = df.apply(lambda row: get_column_name(row, car_brand_mapping), axis=1)
     df['transmission'] = df['transmission'].map({1: 'Automatic', 0: 'Manual'})
 
-    return df[['selling_price', 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
+    return df[['selling_price', 'distance_km' , 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
 
 def reverse_transform(input_features):
     distance_mapping = {
@@ -130,7 +130,7 @@ def reverse_transform(input_features):
     original_format['seats'] = input_features['seats'][0]
     original_format['car_age'] = input_features['car_age'][0]
     original_format['transmission'] = 1 if input_features['transmission'][0] == 'Automatic' else 0
-    original_format['distance_km'] = np.nan  # Placeholder for distance_km, which is not provided in input_features
+    original_format['distance_km'] = input_features['distance_km'][0]
 
     return pd.DataFrame([original_format])
 
