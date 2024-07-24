@@ -130,7 +130,7 @@ def reverse_transform(input_features):
     original_format['seats'] = input_features['seats'][0]
     original_format['car_age'] = input_features['car_age'][0]
     original_format['transmission'] = 1 if input_features['transmission'][0] == 'Automatic' else 0
-    original_format['distance_km'] = input_features['distance_km'][0]
+    original_format['distance_km'] = input_features['distance'][0]
 
     return pd.DataFrame([original_format])
 
