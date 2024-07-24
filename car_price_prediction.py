@@ -196,4 +196,12 @@ scaler.fit(X)
 input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
-with open('catboost_model.pkl', 'rb') as
+with open('catboost_model.pkl', 'rb') as file:
+    model = pickle.load(file)
+
+# Make prediction
+prediction = model.predict(input_features_scaled)
+
+# Display prediction
+st.subheader("Predicted Selling Price")
+st.write(f"${prediction[0]:,.2f}")
