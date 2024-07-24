@@ -62,7 +62,7 @@ def transform_dataset(df):
     df['car_brand'] = df.apply(lambda row: get_column_name(row, car_brand_mapping), axis=1)
     df['transmission'] = df['transmission'].map({1: 'Automatic', 0: 'Manual'})
 
-    return df[['selling_price', 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
+    return df[['car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
 
 def reverse_transform(input_features):
     distance_mapping = {
@@ -125,7 +125,6 @@ def reverse_transform(input_features):
     original_format[car_brand_mapping[input_features['car_brand'][0]]] = 1
 
     # Add the rest of the columns
-    original_format['selling_price'] = input_features['selling_price'][0]
     original_format['mileage_km'] = input_features['mileage_km'][0]
     original_format['engine'] = input_features['engine'][0]
     original_format['seats'] = input_features['seats'][0]
@@ -185,15 +184,9 @@ input_features = pd.DataFrame({
 # Convert input_features back to the original format
 input_features_original_format = reverse_transform(input_features)
 
-# One-hot encode categorical features (dummy encoding)
-input_features_original_format = pd.get_dummies(input_features_original_format)
-df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
-input_features_original_format = input_features_original_format.reindex(columns=df_encoded.columns, fill_value=0)
-
 # Load scaler and scale input features
 scaler = StandardScaler()
-X = df_encoded.drop(columns=['selling_price'])
-scaler.fit(X)
+scaler.fit(df)
 input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
