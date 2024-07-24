@@ -108,7 +108,6 @@ def reverse_transform(input_features):
 
     # Initialize a dictionary with zeros for all one-hot columns
     original_format = {
-        'selling_price': 0,  # Add selling_price to original_format
         'distance_Low': 0, 'distance_Medium': 0, 'distance_High': 0, 'distance_Very High': 0, 'distance_Extremely High': 0,
         'fuel_CNG': 0, 'fuel_Diesel': 0, 'fuel_LPG': 0, 'fuel_Petrol': 0,
         'seller_Dealer': 0, 'seller_Individual': 0, 'seller_Trustmark Dealer': 0,
