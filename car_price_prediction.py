@@ -186,7 +186,7 @@ input_features_original_format = reverse_transform(input_features)
 
 # Load scaler and scale input features
 scaler = StandardScaler()
-scaler.fit(df)
+scaler.fit(input_features_original_format)
 input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
