@@ -185,9 +185,6 @@ input_features = pd.DataFrame({
 # Convert input_features back to the original format
 input_features_original_format = reverse_transform(input_features)
 
-df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
-input_features_original_format = input_features_original_format.reindex(columns=df_encoded.columns, fill_value=0)
-
 # Load scaler and scale input features
 scaler = StandardScaler()
 X = df_encoded.drop(columns=['selling_price'])
