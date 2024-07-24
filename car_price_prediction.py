@@ -19,7 +19,7 @@ if st.checkbox("Show raw data"):
     st.write(df.head())
 
 # Create selection Arrays
-car_brandArr = df['car_brand'].unique()
+# car_brandArr = df['car_brand'].unique()
 transmissionArr = df['transmission'].unique()
 fuelArr = df['fuel'].unique()
 seller_typeArr = df['seller_type'].unique()
@@ -27,7 +27,7 @@ ownerArr = df['owner'].unique()
 
 # User input for new prediction
 st.sidebar.header("Input Features")
-car_brand = st.sidebar.selectbox("Car Brand", car_brandArr)
+# car_brand = st.sidebar.selectbox("Car Brand", car_brandArr)
 mileage_km = st.sidebar.number_input("Mileage (km)", min_value=0, max_value=500000)
 engine = st.sidebar.number_input("Engine (cc)", min_value=500, max_value=5000)
 seats = st.sidebar.number_input("Seats", min_value=2, max_value=8)
@@ -40,7 +40,7 @@ distance = st.sidebar.selectbox("Distance Category", ['Low', 'Medium', 'High', '
 
 # Prepare input for prediction
 input_features = pd.DataFrame({                 
-    'car_brand': [car_brand],
+    # 'car_brand': [car_brand],
     'mileage_km': [mileage_km],
     'engine': [engine],
     'seats': [seats],
