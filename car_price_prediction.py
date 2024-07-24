@@ -14,7 +14,7 @@ st.title("Car Price Prediction App")
 st.write("This app predicts the price of a car based on its features.")
 
 # Load data
-df = pd.read_csv('cardekho.csv')
+df = pd.read_csv('processed_cardekho.csv')
 
 # Identify the columns representing car brands
 car_brand_columns = [col for col in df.columns if 'car_brand' in col or col.endswith('_brand')]
