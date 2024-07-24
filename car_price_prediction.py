@@ -62,7 +62,7 @@ def transform_dataset(df):
     df['car_brand'] = df.apply(lambda row: get_column_name(row, car_brand_mapping), axis=1)
     df['transmission'] = df['transmission'].map({1: 'Automatic', 0: 'Manual'})
 
-    return df[['car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
+    return df[['selling_price', 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
 
 # Title
 st.title("Car Price Prediction App")
@@ -73,8 +73,8 @@ df = pd.read_csv('processed_cardekho.csv')
 df = transform_dataset(df)
 
 # Display data
-if st.checkbox("Show raw data"):
-    st.write(df.head())
+if st.checkbox("Show random sample"):
+    st.write(df.sample(10))
 
 # Create selection arrays
 car_brandArr = df['car_brand'].unique()
