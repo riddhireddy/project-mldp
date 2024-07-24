@@ -185,8 +185,6 @@ input_features = pd.DataFrame({
 # Convert input_features back to the original format
 input_features_original_format = reverse_transform(input_features)
 
-# One-hot encode categorical features (dummy encoding)
-input_features_original_format = pd.get_dummies(input_features_original_format)
 df_encoded = pd.get_dummies(df.drop(columns=['selling_price']))
 input_features_original_format = input_features_original_format.reindex(columns=df_encoded.columns, fill_value=0)
 
