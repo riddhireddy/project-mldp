@@ -22,14 +22,20 @@ def map_and_print_unique(df, column):
 @st.cache
 def load_data():
     df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
+    st.write("Columns in the loaded dataframe:", df.columns.tolist())
     return df
 
 # Transform dataset function
 def transform_dataset(df):
-    st.write("Columns in the dataframe:", df.columns.tolist())
+    st.write("Columns before transformation:", df.columns.tolist())
     
     # Feature engineering
     df.rename(columns={'mileage(km/ltr/kg)': 'mileage_km', 'km_driven': 'distance_km'}, inplace=True)
+    
+    if 'name' not in df.columns:
+        st.write("Error: 'name' column not found in dataframe.")
+        raise KeyError("'name' column not found in dataframe.")
+    
     df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
     df['car_age'] = 2024 - df['year']
     df.drop(columns=['year', 'name'], inplace=True)
@@ -140,4 +146,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
