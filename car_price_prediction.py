@@ -128,19 +128,6 @@ def main():
     mappings = (fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping)
     input_features_original_format = reverse_transform(input_features, mappings)
 
-    # Verify that all columns are numeric
-    st.write("Input features before scaling:")
-    st.write(input_features_original_format)
-    
-    # Check for any non-numeric columns or missing values
-    if not all(input_features_original_format.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
-        st.write("Error: Non-numeric columns found in input features.")
-        raise ValueError("Non-numeric columns found in input features.")
-    
-    if input_features_original_format.isnull().any().any():
-        st.write("Error: Missing values found in input features.")
-        raise ValueError("Missing values found in input features.")
-
     # Load scaler and scale input features
     scaler = StandardScaler()
     scaler.fit(df.drop(columns=['selling_price']))
