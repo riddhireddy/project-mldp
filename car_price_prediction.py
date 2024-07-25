@@ -19,7 +19,7 @@ def map_and_print_unique(df, column):
     return df, mapping
 
 # Load and preprocess data
-@st.cache
+@st.cache(suppress_st_warning=True)
 def load_data():
     df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
     st.write("Columns in the loaded dataframe:", df.columns.tolist())
@@ -132,11 +132,10 @@ def main():
     st.write("Input features before scaling:")
     st.write(input_features_original_format)
     
-    # Check for any non-numeric columns or missing values
-    if not all(input_features_original_format.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
-        st.write("Error: Non-numeric columns found in input features.")
-        raise ValueError("Non-numeric columns found in input features.")
+    # Ensure all columns are numeric
+    input_features_original_format = input_features_original_format.apply(pd.to_numeric, errors='coerce')
     
+    # Check for any non-numeric columns or missing values
     if input_features_original_format.isnull().any().any():
         st.write("Error: Missing values found in input features.")
         raise ValueError("Missing values found in input features.")
