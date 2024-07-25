@@ -1,171 +1,52 @@
-# streamlit_app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from catboost import CatBoostRegressor
+import xgboost as xgb
 import pickle
 
-# Function to transform the dataset
+# Function to map and print unique values
+def map_and_print_unique(df, column):
+    unique_values = sorted(df[column].unique())
+    mapping = {value: idx + 1 for idx, value in enumerate(unique_values)}
+    df[column] = df[column].map(mapping)
+    return df, mapping
+
+# Load and preprocess data
+@st.cache
+def load_data():
+    df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
+    return df
+
+# Transform dataset function
 def transform_dataset(df):
+    df, fuel_mapping = map_and_print_unique(df, 'fuel')
+    df, seller_mapping = map_and_print_unique(df, 'seller_type')
+    df, owner_mapping = map_and_print_unique(df, 'owner')
+    df, car_brand_mapping = map_and_print_unique(df, 'car_brand')
+    df['transmission'] = df['transmission'].apply(lambda x: 1 if x == 'Manual' else 0)
     
-    fuel_mapping = {
-        'fuel_CNG': 'CNG',
-        'fuel_Diesel': 'Diesel',
-        'fuel_LPG': 'LPG',
-        'fuel_Petrol': 'Petrol'
-    }
+    return df, fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping
 
-    seller_mapping = {
-        'seller_Dealer': 'Dealer',
-        'seller_Individual': 'Individual',
-        'seller_Trustmark Dealer': 'Trustmark Dealer'
-    }
-
-    owner_mapping = {
-        'owner_First Owner': 'First Owner',
-        'owner_Fourth & Above Owner': 'Fourth & Above Owner',
-        'owner_Second Owner': 'Second Owner',
-        'owner_Third Owner': 'Third Owner'
-    }
-
-    car_brand_mapping = {
-        'car_brand_Chevrolet': 'Chevrolet',
-        'car_brand_Ford': 'Ford',
-        'car_brand_Honda': 'Honda',
-        'car_brand_Hyundai': 'Hyundai',
-        'car_brand_Mahindra': 'Mahindra',
-        'car_brand_Maruti': 'Maruti',
-        'car_brand_Renault': 'Renault',
-        'car_brand_Tata': 'Tata',
-        'car_brand_Toyota': 'Toyota',
-        'car_brand_Volkswagen': 'Volkswagen',
-        'car_brand_Nissan': 'Nissan',
-        'car_brand_Skoda': 'Skoda',
-        'car_brand_Datsun': 'Datsun',
-        'car_brand_BMW':   'BMW',
-        'car_brand_Mercedes-Benz': 'Mercedes-Benz',
-        'car_brand_Fiat' : 'Fiat',
-        'car_brand_Audi':'Audi',    
-        'car_brand_Jeep':'Jeep',    
-        'car_brand_Mitsubishi':'Mitsubishi',
-        'car_brand_Volvo': 'Volvo',
-        'car_brand_Jaguar': 'Jaguar',
-        'car_brand_Isuzu': 'Isuzu',
-        'car_brand_Ambassador': 'Ambassador',
-        'car_brand_Force': 'Force',
-        'car_brand_Kia' : 'Kia',   
-        'car_brand_Land' : 'Land',  
-        'car_brand_Daewoo' : 'Daewoo',   
-        'car_brand_MG' : 'MG' , 
-        'car_brand_Ashok' : 'Ashok',   
-        'car_brand_Lexus' : 'Lexus',   
-        'car_brand_Opel' : 'Opel',   
-        'car_brand_Peugeot' : 'Peugeot'   
-    }
-
-    def get_column_name(row, mapping):
-        for col in mapping:
-            if row[col] == 1:
-                return mapping[col]
-        return None
-
-    df['distance'] = df.apply(lambda row: get_column_name(row, distance_mapping), axis=1)
-    df['fuel'] = df.apply(lambda row: get_column_name(row, fuel_mapping), axis=1)
-    df['seller_type'] = df.apply(lambda row: get_column_name(row, seller_mapping), axis=1)
-    df['owner'] = df.apply(lambda row: get_column_name(row, owner_mapping), axis=1)
-    df['car_brand'] = df.apply(lambda row: get_column_name(row, car_brand_mapping), axis=1)
-    df['transmission'] = df['transmission'].map({1: 'Automatic', 0: 'Manual'})
-
-    return df[['selling_price', 'distance_km' , 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
-
-def reverse_transform(input_features):
-
-    fuel_mapping = {
-        'CNG': 'fuel_CNG',
-        'Diesel': 'fuel_Diesel',
-        'LPG': 'fuel_LPG',
-        'Petrol': 'fuel_Petrol'
-    }
-
-    seller_mapping = {
-        'Dealer': 'seller_Dealer',
-        'Individual': 'seller_Individual',
-        'Trustmark Dealer': 'seller_Trustmark Dealer'
-    }
-
-    owner_mapping = {
-        'First Owner': 'owner_First Owner',
-        'Fourth & Above Owner': 'owner_Fourth & Above Owner',
-        'Second Owner': 'owner_Second Owner',
-        'Third Owner': 'owner_Third Owner'
-    }
-
-    car_brand_mapping = {
-        'Chevrolet': 'car_brand_Chevrolet',
-        'Ford': 'car_brand_Ford',
-        'Honda': 'car_brand_Honda',
-        'Hyundai': 'car_brand_Hyundai',
-        'Mahindra': 'car_brand_Mahindra',
-        'Maruti': 'car_brand_Maruti',
-        'Renault': 'car_brand_Renault',
-        'Tata': 'car_brand_Tata',
-        'Toyota': 'car_brand_Toyota',
-        'Volkswagen': 'car_brand_Volkswagen',
-        'Nissan': 'car_brand_Nissan',
-        'Skoda': 'car_brand_Skoda',
-        'Datsun': 'car_brand_Datsun',
-        'BMW': 'car_brand_BMW',
-        'Mercedes-Benz': 'car_brand_Mercedes-Benz',
-        'Fiat': 'car_brand_Fiat',
-        'Audi': 'car_brand_Audi',
-        'Jeep': 'car_brand_Jeep',
-        'Mitsubishi': 'car_brand_Mitsubishi',
-        'Volvo': 'car_brand_Volvo',
-        'Jaguar': 'car_brand_Jaguar',
-        'Isuzu': 'car_brand_Isuzu',
-        'Ambassador': 'car_brand_Ambassador',
-        'Force': 'car_brand_Force',
-        'Kia': 'car_brand_Kia',
-        'Land': 'car_brand_Land',
-        'Daewoo': 'car_brand_Daewoo',
-        'MG': 'car_brand_MG',
-        'Ashok': 'car_brand_Ashok',
-        'Lexus': 'car_brand_Lexus',
-        'Opel': 'car_brand_Opel',
-        'Peugeot': 'car_brand_Peugeot'
-    }
-
-    # Initialize a dictionary with zeros for all one-hot columns
+# Reverse transform input features
+def reverse_transform(input_features, mappings):
+    fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping = mappings
+    
+    # Initialize the original format dictionary
     original_format = {
-        'fuel_CNG': 0, 'fuel_Diesel': 0, 'fuel_LPG': 0, 'fuel_Petrol': 0,
-        'seller_Dealer': 0, 'seller_Individual': 0, 'seller_Trustmark Dealer': 0,
-        'owner_First Owner': 0, 'owner_Fourth & Above Owner': 0, 'owner_Second Owner': 0, 'owner_Third Owner': 0,
-        'car_brand_Chevrolet': 0, 'car_brand_Ford': 0, 'car_brand_Honda': 0, 'car_brand_Hyundai': 0,
-        'car_brand_Mahindra': 0, 'car_brand_Maruti': 0, 'car_brand_Renault': 0, 'car_brand_Tata': 0,
-        'car_brand_Toyota': 0, 'car_brand_Volkswagen': 0, 'car_brand_Nissan': 0, 'car_brand_Skoda': 0,
-        'car_brand_Datsun': 0, 'car_brand_BMW': 0, 'car_brand_Mercedes-Benz': 0, 'car_brand_Fiat': 0,
-        'car_brand_Audi': 0, 'car_brand_Jeep': 0, 'car_brand_Mitsubishi': 0, 'car_brand_Volvo': 0,
-        'car_brand_Jaguar': 0, 'car_brand_Isuzu': 0, 'car_brand_Ambassador': 0, 'car_brand_Force': 0,
-        'car_brand_Kia': 0, 'car_brand_Land': 0, 'car_brand_Daewoo': 0, 'car_brand_MG': 0, 'car_brand_Ashok': 0,
-        'car_brand_Lexus': 0, 'car_brand_Opel': 0, 'car_brand_Peugeot': 0
+        'fuel': fuel_mapping[input_features['fuel'][0]],
+        'seller_type': seller_mapping[input_features['seller_type'][0]],
+        'owner': owner_mapping[input_features['owner'][0]],
+        'car_brand': car_brand_mapping[input_features['car_brand'][0]],
+        'transmission': 1 if input_features['transmission'][0] == 'Manual' else 0,
+        'mileage_km': input_features['mileage_km'][0],
+        'engine': input_features['engine'][0],
+        'seats': input_features['seats'][0],
+        'car_age': input_features['car_age'][0],
+        'distance_km': input_features['distance_km'][0],
+        'max_power': input_features['max_power'][0]
     }
-
-    # Set the appropriate columns to 1 based on the input features
-    original_format[distance_mapping[input_features['distance'][0]]] = 1
-    original_format[fuel_mapping[input_features['fuel'][0]]] = 1
-    original_format[seller_mapping[input_features['seller_type'][0]]] = 1
-    original_format[owner_mapping[input_features['owner'][0]]] = 1
-    original_format[car_brand_mapping[input_features['car_brand'][0]]] = 1
-
-    # Add the rest of the columns
-    original_format['mileage_km'] = input_features['mileage_km'][0]
-    original_format['engine'] = input_features['engine'][0]
-    original_format['seats'] = input_features['seats'][0]
-    original_format['car_age'] = input_features['car_age'][0]
-    original_format['transmission'] = 1 if input_features['transmission'][0] == 'Automatic' else 0
-    original_format['distance_km'] = input_features['distance_km'][0]
-
+    
     return pd.DataFrame([original_format])
 
 # Title
@@ -173,20 +54,20 @@ st.title("Car Price Prediction App")
 st.write("This app predicts the price of a car based on its features.")
 
 # Load data
-df = pd.read_csv('processed_cardekho.csv')
-df = transform_dataset(df)
+df = load_data()
+df, fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping = transform_dataset(df)
 
 # Display data
 if st.checkbox("Show random sample"):
     st.write(df.sample(10))
 
 # Create selection arrays
-car_brandArr = df['car_brand'].unique()
-transmissionArr = df['transmission'].unique()
-fuelArr = df['fuel'].unique()
-seller_typeArr = df['seller_type'].unique()
-ownerArr = df['owner'].unique()
-distanceArr = df['distance'].unique()
+car_brandArr = sorted(car_brand_mapping.keys())
+transmissionArr = ['Manual', 'Automatic']
+fuelArr = sorted(fuel_mapping.keys())
+seller_typeArr = sorted(seller_mapping.keys())
+ownerArr = sorted(owner_mapping.keys())
+distanceArr = df['distance_km'].unique()
 
 # User input for new prediction
 st.sidebar.header("Input Features")
@@ -199,8 +80,8 @@ transmission = st.sidebar.selectbox("Transmission", transmissionArr)
 fuel = st.sidebar.selectbox("Fuel Type", fuelArr)
 seller_type = st.sidebar.selectbox("Seller Type", seller_typeArr)
 owner = st.sidebar.selectbox("Owner Type", ownerArr)
-distance = st.sidebar.selectbox("Distance Category", distanceArr)
 distance_km = st.sidebar.number_input("Distance (km)", min_value=0, max_value=500000)
+max_power = st.sidebar.number_input("Max Power (bhp)", min_value=0, max_value=300)
 
 # Prepare input for prediction
 input_features = pd.DataFrame({
@@ -213,20 +94,21 @@ input_features = pd.DataFrame({
     'fuel': [fuel],
     'seller_type': [seller_type],
     'owner': [owner],
-    'distance': [distance],
-    'distance_km' : [distance_km]
+    'distance_km': [distance_km],
+    'max_power': [max_power]
 })
 
 # Convert input_features back to the original format
-input_features_original_format = reverse_transform(input_features)
-st.write(input_features_original_format)
+mappings = (fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping)
+input_features_original_format = reverse_transform(input_features, mappings)
+
 # Load scaler and scale input features
 scaler = StandardScaler()
-scaler.fit(input_features_original_format)
+scaler.fit(df.drop(columns=['selling_price']))
 input_features_scaled = scaler.transform(input_features_original_format)
 
 # Load model
-with open('best_model.pkl', 'rb') as file:
+with open('xgboost_best_model.pkl', 'rb') as file:
     model = pickle.load(file)
 
 # Make prediction
@@ -235,3 +117,6 @@ prediction = model.predict(input_features_scaled)
 # Display prediction
 st.subheader("Predicted Selling Price")
 st.write(f"${prediction[0]:,.2f}")
+
+if __name__ == "__main__":
+    main()
