@@ -1,14 +1,10 @@
-# Features: ['distance_km', 'fuel', 'seller_type', 'transmission', 'owner', 'mileage_km', 'engine', 'max_power', 'seats', 'car_brand', 'car_age']
-
 # streamlit_app.py
 import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from catboost import CatBoostRegressor
-from joblib import load
-import pickle
+import xgboost as xgb
 
 # Load and preprocess data
 def load_data():
@@ -17,9 +13,8 @@ def load_data():
 
 # Load the model
 def load_model():
-    # Load the model from the pickle file or joblib
-    with open('xgboost_best_model.pkl', 'rb') as file:
-        model = pickle.load(file)
+    model = xgb.Booster()
+    model.load_model('best_model.json')  # Load the model from the JSON file
     return model
 
 # Preprocess input features
@@ -60,7 +55,6 @@ def main():
     distance_km = st.number_input("Distance (km)", min_value=0, max_value=500000)
     
     # Prepare input for prediction
-    #['distance_km', 'fuel', 'seller_type', 'transmission', 'owner', 'mileage_km', 'engine', 'max_power', 'seats', 'car_brand', 'car_age']
     input_features = pd.DataFrame({
         'distance_km': [distance_km],
         'fuel': [fuel],
@@ -69,21 +63,23 @@ def main():
         'owner': [owner],
         'mileage_km': [mileage_km],
         'engine': [engine],
-        'max_power': [0],
+        'max_power': [0],  # This field might need to be adjusted based on your data
         'seats': [seats],
         'car_brand': [car_brand],
         'car_age': [car_age]
     })
     
     st.write(input_features)
-
     
     # Load model
     model = load_model()
     
     if st.button("Predict"):
+        # Convert input features to DMatrix
+        dmatrix = xgb.DMatrix(input_features)
+        
         # Make prediction
-        prediction = model.predict(input_features)
+        prediction = model.predict(dmatrix)
         
         # Display prediction
         st.subheader("Predicted Selling Price")
