@@ -32,13 +32,12 @@ def transform_dataset(df):
     # Feature engineering
     df.rename(columns={'mileage(km/ltr/kg)': 'mileage_km', 'km_driven': 'distance_km'}, inplace=True)
     
-    if 'name' not in df.columns:
-        st.write("Error: 'name' column not found in dataframe.")
-        raise KeyError("'name' column not found in dataframe.")
+    if 'car_brand' not in df.columns:
+        st.write("Error: 'car_brand' column not found in dataframe.")
+        raise KeyError("'car_brand' column not found in dataframe.")
     
-    df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
     df['car_age'] = 2024 - df['year']
-    df.drop(columns=['year', 'name'], inplace=True)
+    df.drop(columns=['year'], inplace=True)
     
     st.write("Columns after renaming and feature engineering:", df.columns.tolist())
 
@@ -127,6 +126,19 @@ def main():
     # Convert input_features back to the original format
     mappings = (fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping)
     input_features_original_format = reverse_transform(input_features, mappings)
+
+    # Verify that all columns are numeric
+    st.write("Input features before scaling:")
+    st.write(input_features_original_format)
+    
+    # Check for any non-numeric columns or missing values
+    if not all(input_features_original_format.dtypes.apply(lambda x: np.issubdtype(x, np.number))):
+        st.write("Error: Non-numeric columns found in input features.")
+        raise ValueError("Non-numeric columns found in input features.")
+    
+    if input_features_original_format.isnull().any().any():
+        st.write("Error: Missing values found in input features.")
+        raise ValueError("Missing values found in input features.")
 
     # Load scaler and scale input features
     scaler = StandardScaler()
