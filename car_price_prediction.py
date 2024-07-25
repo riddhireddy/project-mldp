@@ -21,7 +21,7 @@ def map_and_print_unique(df, column):
 # Load and preprocess data
 @st.cache
 def load_data():
-    df = pd.read_csv('processed_cardekho.csv')  # Replace with your dataset path
+    df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
     return df
 
 # Transform dataset function
