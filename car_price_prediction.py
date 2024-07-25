@@ -138,11 +138,13 @@ def main():
     # Check for any non-numeric columns or missing values
     if input_features_original_format.isnull().any().any():
         st.write("Error: Missing values found in input features.")
+        st.write(input_features_original_format)
         raise ValueError("Missing values found in input features.")
 
     # Load scaler and scale input features
+    numeric_columns = df.select_dtypes(include=[np.number]).columns.tolist()
     scaler = StandardScaler()
-    scaler.fit(df.drop(columns=['selling_price']))
+    scaler.fit(df[numeric_columns])
     input_features_scaled = scaler.transform(input_features_original_format)
 
     # Load model
