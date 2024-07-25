@@ -8,13 +8,6 @@ import pickle
 
 # Function to transform the dataset
 def transform_dataset(df):
-    distance_mapping = {
-        'distance_Low': 'Low',
-        'distance_Medium': 'Medium',
-        'distance_High': 'High',
-        'distance_Very High': 'Very High',
-        'distance_Extremely High': 'Extremely High'
-    }
     
     fuel_mapping = {
         'fuel_CNG': 'CNG',
@@ -46,7 +39,29 @@ def transform_dataset(df):
         'car_brand_Renault': 'Renault',
         'car_brand_Tata': 'Tata',
         'car_brand_Toyota': 'Toyota',
-        'car_brand_Volkswagen': 'Volkswagen'
+        'car_brand_Volkswagen': 'Volkswagen',
+        'car_brand_Nissan': 'Nissan',
+        'car_brand_Skoda': 'Skoda',
+        'car_brand_Datsun': 'Datsun',
+        'car_brand_BMW':   'BMW',
+        'car_brand_Mercedes-Benz': 'Mercedes-Benz',
+        'car_brand_Fiat' : 'Fiat',
+        'car_brand_Audi':'Audi',    
+        'car_brand_Jeep':'Jeep',    
+        'car_brand_Mitsubishi':'Mitsubishi',
+        'car_brand_Volvo': 'Volvo',
+        'car_brand_Jaguar': 'Jaguar',
+        'car_brand_Isuzu': 'Isuzu',
+        'car_brand_Ambassador': 'Ambassador',
+        'car_brand_Force': 'Force',
+        'car_brand_Kia' : 'Kia',   
+        'car_brand_Land' : 'Land',  
+        'car_brand_Daewoo' : 'Daewoo',   
+        'car_brand_MG' : 'MG' , 
+        'car_brand_Ashok' : 'Ashok',   
+        'car_brand_Lexus' : 'Lexus',   
+        'car_brand_Opel' : 'Opel',   
+        'car_brand_Peugeot' : 'Peugeot'   
     }
 
     def get_column_name(row, mapping):
@@ -65,13 +80,6 @@ def transform_dataset(df):
     return df[['selling_price', 'distance_km' , 'car_brand', 'mileage_km', 'engine', 'seats', 'car_age', 'transmission', 'fuel', 'seller_type', 'owner', 'distance']]
 
 def reverse_transform(input_features):
-    distance_mapping = {
-        'Low': 'distance_Low',
-        'Medium': 'distance_Medium',
-        'High': 'distance_High',
-        'Very High': 'distance_Very High',
-        'Extremely High': 'distance_Extremely High'
-    }
 
     fuel_mapping = {
         'CNG': 'fuel_CNG',
@@ -103,18 +111,44 @@ def reverse_transform(input_features):
         'Renault': 'car_brand_Renault',
         'Tata': 'car_brand_Tata',
         'Toyota': 'car_brand_Toyota',
-        'Volkswagen': 'car_brand_Volkswagen'
+        'Volkswagen': 'car_brand_Volkswagen',
+        'Nissan': 'car_brand_Nissan',
+        'Skoda': 'car_brand_Skoda',
+        'Datsun': 'car_brand_Datsun',
+        'BMW': 'car_brand_BMW',
+        'Mercedes-Benz': 'car_brand_Mercedes-Benz',
+        'Fiat': 'car_brand_Fiat',
+        'Audi': 'car_brand_Audi',
+        'Jeep': 'car_brand_Jeep',
+        'Mitsubishi': 'car_brand_Mitsubishi',
+        'Volvo': 'car_brand_Volvo',
+        'Jaguar': 'car_brand_Jaguar',
+        'Isuzu': 'car_brand_Isuzu',
+        'Ambassador': 'car_brand_Ambassador',
+        'Force': 'car_brand_Force',
+        'Kia': 'car_brand_Kia',
+        'Land': 'car_brand_Land',
+        'Daewoo': 'car_brand_Daewoo',
+        'MG': 'car_brand_MG',
+        'Ashok': 'car_brand_Ashok',
+        'Lexus': 'car_brand_Lexus',
+        'Opel': 'car_brand_Opel',
+        'Peugeot': 'car_brand_Peugeot'
     }
 
     # Initialize a dictionary with zeros for all one-hot columns
     original_format = {
-        'distance_Low': 0, 'distance_Medium': 0, 'distance_High': 0, 'distance_Very High': 0, 'distance_Extremely High': 0,
         'fuel_CNG': 0, 'fuel_Diesel': 0, 'fuel_LPG': 0, 'fuel_Petrol': 0,
         'seller_Dealer': 0, 'seller_Individual': 0, 'seller_Trustmark Dealer': 0,
         'owner_First Owner': 0, 'owner_Fourth & Above Owner': 0, 'owner_Second Owner': 0, 'owner_Third Owner': 0,
         'car_brand_Chevrolet': 0, 'car_brand_Ford': 0, 'car_brand_Honda': 0, 'car_brand_Hyundai': 0,
         'car_brand_Mahindra': 0, 'car_brand_Maruti': 0, 'car_brand_Renault': 0, 'car_brand_Tata': 0,
-        'car_brand_Toyota': 0, 'car_brand_Volkswagen': 0
+        'car_brand_Toyota': 0, 'car_brand_Volkswagen': 0, 'car_brand_Nissan': 0, 'car_brand_Skoda': 0,
+        'car_brand_Datsun': 0, 'car_brand_BMW': 0, 'car_brand_Mercedes-Benz': 0, 'car_brand_Fiat': 0,
+        'car_brand_Audi': 0, 'car_brand_Jeep': 0, 'car_brand_Mitsubishi': 0, 'car_brand_Volvo': 0,
+        'car_brand_Jaguar': 0, 'car_brand_Isuzu': 0, 'car_brand_Ambassador': 0, 'car_brand_Force': 0,
+        'car_brand_Kia': 0, 'car_brand_Land': 0, 'car_brand_Daewoo': 0, 'car_brand_MG': 0, 'car_brand_Ashok': 0,
+        'car_brand_Lexus': 0, 'car_brand_Opel': 0, 'car_brand_Peugeot': 0
     }
 
     # Set the appropriate columns to 1 based on the input features
