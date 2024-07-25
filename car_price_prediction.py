@@ -19,7 +19,7 @@ def map_and_print_unique(df, column):
     return df, mapping
 
 # Load and preprocess data
-@st.cache(suppress_st_warning=True)
+@st.cache_data
 def load_data():
     df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
     st.write("Columns in the loaded dataframe:", df.columns.tolist())
@@ -77,7 +77,7 @@ def main():
     st.write("This app predicts the price of a car based on its features.")
 
     # Load data
-    df = load_data()
+    df = load_data().copy()
     st.write("Initial dataframe loaded. Here are the first few rows:")
     st.write(df.head())
 
@@ -142,9 +142,9 @@ def main():
         raise ValueError("Missing values found in input features.")
 
     # Load scaler and scale input features
-    numeric_columns = df.select_dtypes(include=[np.number]).columns.tolist()
     scaler = StandardScaler()
-    scaler.fit(df[numeric_columns])
+    feature_columns = [col for col in df.columns if col != 'selling_price']
+    scaler.fit(df[feature_columns])
     input_features_scaled = scaler.transform(input_features_original_format)
 
     # Load model
