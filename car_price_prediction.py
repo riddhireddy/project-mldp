@@ -9,7 +9,7 @@ import pickle
 def map_and_print_unique(df, column):
     if column not in df.columns:
         st.write(f"Error: Column '{column}' not found in dataframe.")
-        st.write("Columns present in dataframe:", df.columns)
+        st.write("Columns present in dataframe:", df.columns.tolist())
         raise KeyError(f"Column '{column}' not found in dataframe.")
     
     unique_values = sorted(df[column].unique())
@@ -21,7 +21,7 @@ def map_and_print_unique(df, column):
 # Load and preprocess data
 @st.cache
 def load_data():
-    df = pd.read_csv('cardekho.csv')  # Replace with your dataset path
+    df = pd.read_csv('processed_cardekho.csv')  # Replace with your dataset path
     return df
 
 # Transform dataset function
@@ -132,6 +132,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
 
 
