@@ -32,9 +32,9 @@ def transform_dataset(df):
     # Feature engineering
     df.rename(columns={'mileage(km/ltr/kg)': 'mileage_km', 'km_driven': 'distance_km'}, inplace=True)
     
-    if 'car_brand' not in df.columns:
-        st.write("Error: 'car_brand' column not found in dataframe.")
-        raise KeyError("'car_brand' column not found in dataframe.")
+    if 'name' in df.columns:
+        df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
+        df.drop(columns=['name'], inplace=True)
     
     if 'year' in df.columns:
         df['car_age'] = 2024 - df['year']
