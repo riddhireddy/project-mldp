@@ -7,6 +7,11 @@ import pickle
 
 # Function to map and print unique values
 def map_and_print_unique(df, column):
+    if column not in df.columns:
+        st.write(f"Error: Column '{column}' not found in dataframe.")
+        st.write("Columns present in dataframe:", df.columns)
+        raise KeyError(f"Column '{column}' not found in dataframe.")
+    
     unique_values = sorted(df[column].unique())
     mapping = {value: idx + 1 for idx, value in enumerate(unique_values)}
     df[column] = df[column].map(mapping)
@@ -21,7 +26,8 @@ def load_data():
 
 # Transform dataset function
 def transform_dataset(df):
-    st.write("Columns in the dataframe:", df.columns)
+    st.write("Columns in the dataframe:", df.columns.tolist())
+    
     df, fuel_mapping = map_and_print_unique(df, 'fuel')
     df, seller_mapping = map_and_print_unique(df, 'seller_type')
     df, owner_mapping = map_and_print_unique(df, 'owner')
@@ -58,6 +64,9 @@ def main():
 
     # Load data
     df = load_data()
+    st.write("Initial dataframe loaded. Here are the first few rows:")
+    st.write(df.head())
+
     df, fuel_mapping, seller_mapping, owner_mapping, car_brand_mapping = transform_dataset(df)
 
     # Display data
