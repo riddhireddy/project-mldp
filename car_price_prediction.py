@@ -28,6 +28,14 @@ def load_data():
 def transform_dataset(df):
     st.write("Columns in the dataframe:", df.columns.tolist())
     
+    # Feature engineering
+    df.rename(columns={'mileage(km/ltr/kg)': 'mileage_km', 'km_driven': 'distance_km'}, inplace=True)
+    df['car_brand'] = df['name'].apply(lambda x: x.split()[0])
+    df['car_age'] = 2024 - df['year']
+    df.drop(columns=['year', 'name'], inplace=True)
+    
+    st.write("Columns after renaming and feature engineering:", df.columns.tolist())
+
     df, fuel_mapping = map_and_print_unique(df, 'fuel')
     df, seller_mapping = map_and_print_unique(df, 'seller_type')
     df, owner_mapping = map_and_print_unique(df, 'owner')
@@ -132,5 +140,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
