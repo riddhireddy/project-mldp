@@ -36,8 +36,9 @@ def transform_dataset(df):
         st.write("Error: 'car_brand' column not found in dataframe.")
         raise KeyError("'car_brand' column not found in dataframe.")
     
-    df['car_age'] = 2024 - df['year']
-    df.drop(columns=['year'], inplace=True)
+    if 'year' in df.columns:
+        df['car_age'] = 2024 - df['year']
+        df.drop(columns=['year'], inplace=True)
     
     st.write("Columns after renaming and feature engineering:", df.columns.tolist())
 
