@@ -44,8 +44,8 @@ def main():
     # User input for new prediction
     st.header("Input Features")
     car_brand = car_brandTuple.index(st.selectbox("Car Brand", car_brandTuple)) + 1
-    mileage_km = st.number_input("Mileage (km)", min_value=0, max_value=500000)
-    engine = st.number_input("Engine (cc)", min_value=500, max_value=5000)
+    mileage_km = st.number_input("Mileage (km)", min_value=0, max_value=5000000)
+    engine = st.number_input("Engine (cc)", min_value=500, max_value=4000)
     seats = st.number_input("Seats", min_value=2, max_value=8)
     car_age = st.number_input("Car Age", min_value=0, max_value=30)
     transmission = transmissionTuple.index(st.selectbox("Transmission", transmissionTuple)) + 1
